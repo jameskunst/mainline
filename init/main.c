@@ -867,6 +867,7 @@ static int __init early_randomize_kstack_offset(char *buf)
 early_param("randomize_kstack_offset", early_randomize_kstack_offset);
 #endif
 
+void __init init_sync_kmem_pool(void);
 void __init init_dma_buf_kmem_pool(void);
 
 void __init __weak arch_call_rest_init(void)
@@ -1077,6 +1078,7 @@ asmlinkage __visible void __init __no_sanitize_address start_kernel(void)
 	cgroup_init();
 	taskstats_init_early();
 	delayacct_init();
+	init_sync_kmem_pool();
 	init_dma_buf_kmem_pool();
 
 	poking_init();

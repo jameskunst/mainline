@@ -29,6 +29,13 @@
 #include <uapi/linux/dma-buf.h>
 #include <uapi/linux/magic.h>
 
+static struct kmem_cache *kmem_attach_pool;
+
+void __init init_dma_buf_kmem_pool(void)
+{
+	kmem_attach_pool = KMEM_CACHE(dma_buf_attachment, SLAB_HWCACHE_ALIGN | SLAB_PANIC);
+}
+
 static inline int is_dma_buf_file(struct file *);
 
 struct dma_buf_list {
@@ -730,8 +737,8 @@ dma_buf_dynamic_attach(struct dma_buf *dmabuf, struct device *dev,
 	if (WARN_ON(importer_ops && !importer_ops->move_notify))
 		return ERR_PTR(-EINVAL);
 
-	attach = kzalloc(sizeof(*attach), GFP_KERNEL);
-	if (!attach)
+	attach = kmem_cache_zalloc(kmem_attach_pool, GFP_KERNEL);
+	if (attach == NULL)
 		return ERR_PTR(-ENOMEM);
 
 	attach->dev = dev;
@@ -781,7 +788,7 @@ dma_buf_dynamic_attach(struct dma_buf *dmabuf, struct device *dev,
 	return attach;
 
 err_attach:
-	kfree(attach);
+	kmem_cache_free(kmem_attach_pool, attach);
 	return ERR_PTR(ret);
 
 err_unpin:
@@ -854,7 +861,7 @@ void dma_buf_detach(struct dma_buf *dmabuf, struct dma_buf_attachment *attach)
 	if (dmabuf->ops->detach)
 		dmabuf->ops->detach(dmabuf, attach);
 
-	kfree(attach);
+	kmem_cache_free(kmem_attach_pool, attach);
 }
 EXPORT_SYMBOL_GPL(dma_buf_detach);
 

@@ -646,6 +646,7 @@ getxattr(struct user_namespace *mnt_userns, struct dentry *d,
 	ssize_t error;
 	void *kvalue = NULL;
 	char kname[XATTR_NAME_MAX + 1];
+	char kvalue_onstack[255];
 
 	error = strncpy_from_user(kname, name, sizeof(kname));
 	if (error == 0 || error == sizeof(kname))
@@ -654,11 +655,15 @@ getxattr(struct user_namespace *mnt_userns, struct dentry *d,
 		return error;
 
 	if (size) {
-		if (size > XATTR_SIZE_MAX)
-			size = XATTR_SIZE_MAX;
-		kvalue = kvzalloc(size, GFP_KERNEL);
-		if (!kvalue)
-			return -ENOMEM;
+		if (size <= ARRAY_SIZE(kvalue_onstack)) {
+			kvalue = kvalue_onstack;
+		} else {
+			if (size > XATTR_SIZE_MAX)
+				size = XATTR_SIZE_MAX;
+			kvalue = kvzalloc(size, GFP_KERNEL);
+			if (!kvalue)
+				return -ENOMEM;
+		}
 	}
 
 	error = vfs_getxattr(mnt_userns, d, kname, kvalue, size);
@@ -674,7 +679,8 @@ getxattr(struct user_namespace *mnt_userns, struct dentry *d,
 		error = -E2BIG;
 	}
 
-	kvfree(kvalue);
+	if (kvalue != kvalue_onstack)
+		kvfree(kvalue);
 
 	return error;
 }

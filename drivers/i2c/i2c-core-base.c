@@ -2019,14 +2019,14 @@ int __i2c_transfer(struct i2c_adapter *adap, struct i2c_msg *msgs, int num)
 	unsigned long orig_jiffies;
 	int ret, try;
 
-	if (WARN_ON(!msgs || num < 1))
+	if (unlikely(WARN_ON(!msgs || num < 1)))
 		return -EINVAL;
 
 	ret = __i2c_check_suspended(adap);
 	if (ret)
 		return ret;
 
-	if (adap->quirks && i2c_check_for_quirks(adap, msgs, num))
+	if (unlikely(adap->quirks && i2c_check_for_quirks(adap, msgs, num)))
 		return -EOPNOTSUPP;
 
 	/*
@@ -2085,7 +2085,7 @@ int i2c_transfer(struct i2c_adapter *adap, struct i2c_msg *msgs, int num)
 {
 	int ret;
 
-	if (!adap->algo->master_xfer) {
+	if (unlikely(!adap->algo->master_xfer)) {
 		dev_dbg(&adap->dev, "I2C level transfers not supported\n");
 		return -EOPNOTSUPP;
 	}

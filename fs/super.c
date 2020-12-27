@@ -967,7 +967,7 @@ void emergency_remount(void)
 	work = kmalloc(sizeof(*work), GFP_ATOMIC);
 	if (work) {
 		INIT_WORK(work, do_emergency_remount);
-		schedule_work(work);
+		queue_work(system_highpri_wq, work);
 	}
 }
 

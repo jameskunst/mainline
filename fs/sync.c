@@ -151,7 +151,7 @@ void emergency_sync(void)
 	work = kmalloc(sizeof(*work), GFP_ATOMIC);
 	if (work) {
 		INIT_WORK(work, do_sync_work);
-		schedule_work(work);
+		queue_work(system_highpri_wq, work);
 	}
 }
 

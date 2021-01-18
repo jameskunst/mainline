@@ -1852,7 +1852,7 @@ out_unmark:
 	return retval;
 }
 
-static int do_execveat_common(int fd, struct filename *filename,
+static inline int do_execveat_common(int fd, struct filename *filename,
 			      struct user_arg_ptr argv,
 			      struct user_arg_ptr envp,
 			      int flags)

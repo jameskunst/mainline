@@ -501,6 +501,10 @@ KBUILD_CFLAGS   := -pipe -Wall -Wundef -Werror=strict-prototypes -Wno-trigraphs 
 # Avoid gcc-10 regression
 KBUILD_CFLAGS	+= --param=max-inline-insns-auto=1000
 
+# Inlining optimisation
+KBUILD_CFLAGS	+= --param inline-min-speedup=100
+KBUILD_CFLAGS	+= --param inline-unit-growth=500
+
 KBUILD_CPPFLAGS := -D__KERNEL__
 KBUILD_AFLAGS_KERNEL :=
 KBUILD_CFLAGS_KERNEL :=

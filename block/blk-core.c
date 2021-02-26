@@ -433,7 +433,6 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
 	const bool pm = flags & BLK_MQ_REQ_PM;
 
 	while (true) {
-		bool success = false;
 
 		rcu_read_lock();
 		if (percpu_ref_tryget_live(&q->q_usage_counter)) {
@@ -444,15 +443,12 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
 			 */
 			if ((pm && queue_rpm_status(q) != RPM_SUSPENDED) ||
 			    !blk_queue_pm_only(q)) {
-				success = true;
+				return 0;
 			} else {
 				percpu_ref_put(&q->q_usage_counter);
 			}
 		}
 		rcu_read_unlock();
-
-		if (success)
-			return 0;
 
 		if (flags & BLK_MQ_REQ_NOWAIT)
 			return -EBUSY;

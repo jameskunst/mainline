@@ -10,8 +10,12 @@
 #
 # Normal rules (sorted alphabetically)
 #
-.*
+*.config.old
+.*cmd
+.*y*
 *.a
+*.d
+*.version
 *.asn1.[ch]
 *.bin
 *.bz2

@@ -641,6 +641,9 @@ const struct inode_operations proc_link_inode_operations = {
 	.get_link	= proc_get_link,
 };
 
+	/* procfs dentries and inodes don't require IO to create */
+	s->s_shrink.seeks = 0;
+	
 struct inode *proc_get_inode(struct super_block *sb, struct proc_dir_entry *de)
 {
 	struct inode *inode = new_inode(sb);

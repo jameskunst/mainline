@@ -1704,7 +1704,7 @@ typedef enum {
 #ifdef CONFIG_PREEMPT_RT
 int sysctl_compact_unevictable_allowed __read_mostly = 0;
 #else
-int sysctl_compact_unevictable_allowed __read_mostly = 1;
+int sysctl_compact_unevictable_allowed __read_mostly = 0;
 #endif
 
 static inline void
@@ -2542,7 +2542,7 @@ static enum compact_result compact_zone_order(struct zone *zone, int order,
 	return ret;
 }
 
-int sysctl_extfrag_threshold = 500;
+int sysctl_extfrag_threshold = 750;
 
 /**
  * try_to_compact_pages - Direct compact to satisfy a high-order allocation

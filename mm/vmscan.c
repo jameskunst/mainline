@@ -440,9 +440,19 @@ static unsigned long do_shrink_slab(struct shrink_control *shrinkctl,
 
 	total_scan = nr;
 	if (shrinker->seeks) {
+		if (shrinker->seeks) {
 		delta = freeable >> priority;
 		delta *= 4;
 		do_div(delta, shrinker->seeks);
+	} else {
+		/*
+		 * These objects don't require any IO to create. Trim
+		 * them aggressively under memory pressure to keep
+		 * them from causing refetches in the IO caches.
+		 */
+		delta = freeable / 2;
+	}
+	
 	} else {
 		/*
 		 * These objects don't require any IO to create. Trim

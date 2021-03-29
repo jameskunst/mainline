@@ -42,9 +42,6 @@
 
 #include "i2c-core.h"
 
-#define CREATE_TRACE_POINTS
-#include <trace/events/i2c.h>
-
 #define I2C_ADDR_OFFSET_TEN_BIT	0xa000
 #define I2C_ADDR_OFFSET_SLAVE	0x1000
 
@@ -62,19 +59,8 @@ static DEFINE_IDR(i2c_adapter_idr);
 
 static int i2c_detect(struct i2c_adapter *adapter, struct i2c_driver *driver);
 
-static DEFINE_STATIC_KEY_FALSE(i2c_trace_msg_key);
 static bool is_registered;
 
-int i2c_transfer_trace_reg(void)
-{
-	static_branch_inc(&i2c_trace_msg_key);
-	return 0;
-}
-
-void i2c_transfer_trace_unreg(void)
-{
-	static_branch_dec(&i2c_trace_msg_key);
-}
 
 const struct i2c_device_id *i2c_match_id(const struct i2c_device_id *id,
 						const struct i2c_client *client)
@@ -1923,7 +1909,6 @@ static void __exit i2c_exit(void)
 	class_compat_unregister(i2c_adapter_compat_class);
 #endif
 	bus_unregister(&i2c_bus_type);
-	tracepoint_synchronize_unregister();
 }
 
 /* We must initialize early, because some subsystems register i2c drivers
@@ -2029,20 +2014,6 @@ int __i2c_transfer(struct i2c_adapter *adap, struct i2c_msg *msgs, int num)
 	if (unlikely(adap->quirks && i2c_check_for_quirks(adap, msgs, num)))
 		return -EOPNOTSUPP;
 
-	/*
-	 * i2c_trace_msg_key gets enabled when tracepoint i2c_transfer gets
-	 * enabled.  This is an efficient way of keeping the for-loop from
-	 * being executed when not needed.
-	 */
-	if (static_branch_unlikely(&i2c_trace_msg_key)) {
-		int i;
-		for (i = 0; i < num; i++)
-			if (msgs[i].flags & I2C_M_RD)
-				trace_i2c_read(adap, &msgs[i], i);
-			else
-				trace_i2c_write(adap, &msgs[i], i);
-	}
-
 	/* Retry automatically on arbitration loss */
 	orig_jiffies = jiffies;
 	for (ret = 0, try = 0; try <= adap->retries; try++) {
@@ -2055,14 +2026,6 @@ int __i2c_transfer(struct i2c_adapter *adap, struct i2c_msg *msgs, int num)
 			break;
 		if (time_after(jiffies, orig_jiffies + adap->timeout))
 			break;
-	}
-
-	if (static_branch_unlikely(&i2c_trace_msg_key)) {
-		int i;
-		for (i = 0; i < ret; i++)
-			if (msgs[i].flags & I2C_M_RD)
-				trace_i2c_reply(adap, &msgs[i], i);
-		trace_i2c_result(adap, num, ret);
 	}
 
 	return ret;

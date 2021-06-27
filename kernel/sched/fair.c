@@ -35,8 +35,8 @@
  *
  * (default: 6ms * (1 + ilog(ncpus)), units: nanoseconds)
  */
-unsigned int sysctl_sched_latency			= 500000ULL;
-static unsigned int normalized_sysctl_sched_latency	= 500000ULL;
+unsigned int sysctl_sched_latency			= 1000000ULL;
+static unsigned int normalized_sysctl_sched_latency	= 1000000ULL;
 
 /*
  * The initial- and re-scaling of tunables is configurable
@@ -56,8 +56,8 @@ enum sched_tunable_scaling sysctl_sched_tunable_scaling = SCHED_TUNABLESCALING_N
  *
  * (default: 0.75 msec * (1 + ilog(ncpus)), units: nanoseconds)
  */
-unsigned int sysctl_sched_min_granularity			= 50000ULL;
-static unsigned int normalized_sysctl_sched_min_granularity	= 50000ULL;
+unsigned int sysctl_sched_min_granularity			= 100000ULL;
+static unsigned int normalized_sysctl_sched_min_granularity	= 100000ULL;
 
 /*
  * This value is kept at sysctl_sched_latency/sysctl_sched_min_granularity
@@ -82,7 +82,7 @@ unsigned int sysctl_sched_child_runs_first __read_mostly;
 unsigned int sysctl_sched_wakeup_granularity			= 1000000UL;
 static unsigned int normalized_sysctl_sched_wakeup_granularity	= 1000000UL;
 
-const_debug unsigned int sysctl_sched_migration_cost	= 100000UL;
+const_debug unsigned int sysctl_sched_migration_cost	= 200000UL;
 
 int sched_thermal_decay_shift;
 static int __init setup_sched_thermal_decay_shift(char *str)

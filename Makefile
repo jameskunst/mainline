@@ -1025,6 +1025,9 @@ include-$(CONFIG_UBSAN)		+= scripts/Makefile.ubsan
 include-$(CONFIG_KCOV)		+= scripts/Makefile.kcov
 include-$(CONFIG_GCC_PLUGINS)	+= scripts/Makefile.gcc-plugins
 
+# Use store motion pass for gcse
+KBUILD_CFLAGS	+= $(call cc-option,-fgcse-sm)
+
 include $(addprefix $(srctree)/, $(include-y))
 
 # scripts/Makefile.gcc-plugins is intentionally included last.

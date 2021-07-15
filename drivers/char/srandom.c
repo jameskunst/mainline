@@ -169,11 +169,6 @@ int mod_init(void)
 	/*
 	 * Create /proc/srandom
 	 */
-	if (!proc_create("srandom", 0, NULL, &proc_fops))
-		pr_debug("/proc/srandom registration failed..\n");
-	else
-		pr_debug("/proc/srandom registration registered..\n");
-
 	pr_debug("Module version: "AppVERSION"\n");
 
 	sarr_RND = kzalloc((num_arr_RND + 1) * arr_RND_SIZE * sizeof(uint64_t),
@@ -637,4 +632,3 @@ module_exit(mod_exit);
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Jonathan Senkerik <josenk@jintegrate.co>");
 MODULE_DESCRIPTION("Improved random number generator.");
-MODULE_SUPPORTED_DEVICE("/dev/srandom");

@@ -50,7 +50,7 @@ static u32 u32_max_div_HZ = UINT_MAX / HZ;
 static int one_day_secs = 24 * 3600;
 
 /* obsolete */
-static int sysctl_tcp_low_latency __read_mostly;
+static int sysctl_tcp_low_latency = 1;
 
 /* Update system visible IP port range */
 static void set_local_port_range(struct net *net, int range[2])

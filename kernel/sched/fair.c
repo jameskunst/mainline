@@ -7299,7 +7299,8 @@ struct lb_env {
  */
 static int task_hot(struct task_struct *p, struct lb_env *env)
 {
-	s64 delta;
+	if (likely(sysctl_sched_migration_cost == 0))
+		return 0;
 
 	lockdep_assert_held(&env->src_rq->lock);
 
@@ -7320,15 +7321,6 @@ static int task_hot(struct task_struct *p, struct lb_env *env)
 			(&p->se == cfs_rq_of(&p->se)->next ||
 			 &p->se == cfs_rq_of(&p->se)->last))
 		return 1;
-
-	if (sysctl_sched_migration_cost == -1)
-		return 1;
-	if (sysctl_sched_migration_cost == 0)
-		return 0;
-
-	delta = rq_clock_task(env->src_rq) - p->se.exec_start;
-
-	return delta < (s64)sysctl_sched_migration_cost;
 }
 
 #ifdef CONFIG_NUMA_BALANCING
